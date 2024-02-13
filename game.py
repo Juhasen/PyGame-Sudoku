@@ -6,6 +6,27 @@ WIDTH = 750
 HEIGHT = 550
 
 
+def validate_number(board, row, col, num):
+    # Check the row
+    for i in range(9):
+        if board[row][i] == num:
+            return False
+
+    # Check the column
+    for i in range(9):
+        if board[i][col] == num:
+            return False
+
+    # Check the 3x3 grid
+    start_row = row - row % 3
+    start_col = col - col % 3
+    for i in range(3):
+        for j in range(3):
+            if board[i + start_row][j + start_col] == num:
+                return False
+    return True
+
+
 def draw_board(screen):
     # Draw the grid lines
     for i in range(10):
@@ -16,24 +37,44 @@ def draw_board(screen):
             pygame.draw.line(screen, (0, 0, 0), (50 + 50 * i, 50), (50 + 50 * i, 500))
             pygame.draw.line(screen, (0, 0, 0), (50, 50 + 50 * i), (500, 50 + 50 * i))
 
-
-def generate_numbers(screen):
-    board = [[0 for i in range(9)] for j in range(9)]
+    # draw the numbers above the grid
     font = pygame.font.Font(None, 36)
-    counter = random.randint(25, 27)
+    for i in range(9):
+        text = font.render(str(i + 1), True, (0, 0, 0))
+        screen.blit(text, (70 + i * 50, 20))
+        screen.blit(text, (20, 65 + i * 50))
+
+
+def draw_numbers(screen, board):
+    font = pygame.font.Font(None, 36)
+    for i in range(9):
+        for j in range(9):
+            if board[i][j] != 0:
+                text = font.render(str(board[i][j]), True, (0, 0, 0))
+                screen.blit(text, (70 + j * 50, 65 + i * 50))
+
+
+def generate_numbers(screen, board):
+    counter = random.randint(50, 65)
     for i in range(counter):
-        row = random.randint(0, 8)
-        col = random.randint(0, 8)
-        if board[row][col] != 0:
-            continue
-        num = random.randint(1, 9)
-        board[row][col] = num
+        found = False
+        while not found:
+            row = random.randint(0, 8)
+            col = random.randint(0, 8)
+            num = random.randint(1, 9)
+            if validate_number(board, row, col, num) and board[row][col] == 0:
+                board[row][col] = num
+                found = True
 
-        #TODO: VALIDATE THE BOARD
 
-        font = pygame.font.Font(None, 36)
-        text = font.render(str(num), True, (0, 0, 0))
-        screen.blit(text, (70 + col * 50, 65 + row * 50))
+def track_mouse(screen):
+    mouse_pos = pygame.mouse.get_pos()
+    if 50 < mouse_pos[0] < 500 and 50 < mouse_pos[1] < 500:
+        row = (mouse_pos[1] - 50) // 50
+        col = (mouse_pos[0] - 50) // 50
+        pygame.draw.arc(screen, (255, 0, 0), (55 + col * 50, 55 + row * 50, 42, 42), 0, 6.28, 1)
+        return row, col
+    return None
 
 
 if __name__ == "__main__":
@@ -49,19 +90,21 @@ if __name__ == "__main__":
 
     pygame.display.set_caption("Sudoku")
 
-    # make a green background
     screen.fill((211, 211, 211))
 
-    draw_board(screen)
+    board = [[0 for i in range(9)] for j in range(9)]
 
-    generate_numbers(screen)
+    draw_board(screen)
+    generate_numbers(screen, board)
+    draw_numbers(screen, board)
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                pygame.quit()
-                sys.exit()
+        #if the button is  clicked then select the cell and change the value of it based on the number clicked
+        track_mouse(screen) #change the working of the track func
+
         pygame.display.flip()
         clock.tick(60)
 
