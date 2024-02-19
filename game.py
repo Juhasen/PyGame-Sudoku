@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-from render import render_board, render_numbers, generate_numbers, render_description, clear_screen
+from render import draw_board, draw_numbers, generate_numbers, draw_description, clear_screen
 from mouse_action import handle_click
 from validate import solve_sudoku
 
@@ -20,33 +20,38 @@ if __name__ == "__main__":
     running = True
 
     pygame.display.set_caption("Sudoku")
-    img = pygame.image.load("icon.png")
+    img = pygame.image.load('icon.png')
     pygame.display.set_icon(img)
 
     screen.fill((211, 211, 211))
-
-    board = [[0 for i in range(9)] for j in range(9)]
     generated_cells = []
-    render_board(screen)
-    generate_numbers(board, generated_cells)
-    render_description(screen)
+    draw_board(screen)
+    board = generate_numbers(generated_cells)
+    draw_description(screen)
     pos = []
     row, col = 0, 0
 
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                board = [[0 for i in range(9)] for j in range(9)]
-                clear_screen(screen)
-                generate_numbers(board, generated_cells)
-                break
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    clear_screen(screen)
+                    board = generate_numbers(generated_cells)
+                    break
+                elif event.key == pygame.K_s:
+                    for i in range(9):
+                        for j in range(9):
+                            if (i, j) not in generated_cells:
+                                board[i][j] = 0
+                    solve_sudoku(board)
+                    break
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = handle_click(screen, board)
                 if pos:
                     row, col = pos
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                 running = False
-            elif event.type == pygame.KEYDOWN and pos and pos not in generated_cells:
+            elif event.type == pygame.KEYDOWN and pos and pos in generated_cells:
                 if event.key == pygame.K_1:
                     board[row][col] = 1
                 elif event.key == pygame.K_2:
@@ -67,11 +72,8 @@ if __name__ == "__main__":
                     board[row][col] = 9
                 elif event.key == pygame.K_d:
                     board[row][col] = 0
-                elif event.key == pygame.K_s:
-                    solve_sudoku(board)
 
-        render_numbers(screen, board, generated_cells)
-
+        draw_numbers(screen, board, generated_cells)
         pygame.display.update()
         clock.tick(60)
 
