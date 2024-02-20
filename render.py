@@ -28,20 +28,15 @@ def draw_numbers(screen, board, ungenerated_cells):
     font = pygame.font.Font(None, 36)
 
     black = (0, 0, 0)
-    red = (255, 0, 0)
-    green = (50, 205, 50)
+    green = (0, 128, 0)
 
     for i in range(0, 9):
         for j in range(0, 9):
-            correct = validate_number(board, i, j, board[i][j])
-            if (i, j) not in ungenerated_cells:  # if the cell is generated, draw black number
+            if (i, j) not in ungenerated_cells:
                 text = font.render(str(board[i][j]), True, black)
                 screen.blit(text, (70 + j * 50, 62 + i * 50))
-            elif board[i][j] != 0 and correct:
+            elif board[i][j] != 0:
                 text = font.render(str(board[i][j]), True, green)
-                screen.blit(text, (70 + j * 50, 62 + i * 50))
-            elif board[i][j] != 0 and not correct:
-                text = font.render(str(board[i][j]), True, red)
                 screen.blit(text, (70 + j * 50, 62 + i * 50))
 
 
@@ -67,8 +62,8 @@ def draw_description(screen):
     press = font.render("Then press a number to fill the cell", True, (0, 0, 0))
     range1_9 = font.render("The numbers range from 1 to 9", True, (0, 0, 0))
     delete = font.render("Press 'd' to delete a number", True, (0, 0, 0))
-    reset = font.render("Press 'r' to reset the board", True, (0, 0, 0))
-    solve = font.render("Press 's' to show the answer", True, (0, 0, 0))
+    reset = font.render("Press 'r' to reset the board", True, (0, 0, 0)) 
+    solve = font.render("Press 's' to submit the answer", True, (0, 0, 0))
     cell = font.render("Selected cell:", True, (0, 0, 0))
     quit_app = font.render("Press 'q' to quit the game", True, (0, 0, 0))
     screen.blit(click, (550, 50))
@@ -79,6 +74,24 @@ def draw_description(screen):
     screen.blit(solve, (550, 300))
     screen.blit(cell, (550, 350))
     screen.blit(quit_app, (550, 490))
+
+
+def draw_win(screen, how_many_errors, wrong_cells):
+    font = pygame.font.Font(None, 32)
+    color = (0, 0, 0)
+    if how_many_errors == 0:
+        color = (0, 128 , 0)
+        text = font.render(f"You won!", True, color)
+        screen.blit(text, (550, 420))
+    else:
+        color = (255, 0, 0)
+        text = font.render(f"You lost! There are {how_many_errors} errors", True, color)
+        screen.blit(text, (550, 420))
+        for cell in wrong_cells:
+            pygame.draw.rect(screen, (255, 0, 0), (54 + cell[1] * 50, 54 + cell[0] * 50, 43, 43), 1)
+
+    text = font.render("Press 'r' to reset the board", True, color)
+    screen.blit(text, (550, 450))
 
 
 def clear_screen(screen):
