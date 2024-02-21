@@ -19,5 +19,10 @@ After installing them just run:
 ```py
 python game.py
 ```
+**Good Luck!**
 
-Good Luck!
+A little preview:
+
+![image](https://github.com/Juhasen/PyGame-Sudoku/assets/113551503/eff9b3fb-af04-4218-984e-21b1b8996218)
+
+
